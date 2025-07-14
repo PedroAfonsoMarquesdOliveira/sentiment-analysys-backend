@@ -11,7 +11,10 @@ def fetch_news(request: BankRequest):
     API_KEY = os.getenv("NEWS_API_KEY")
     if not API_KEY:
         raise ValueError("NEWS_API_KEY not found in environment variables.")
-    url = f"https://newsapi.org/v2/everything?q={request.bank_name}&language={request.language}&apiKey={API_KEY}"
+    if request.language == "all":
+        url = f"https://newsapi.org/v2/everything?q={request.bank_name}&apiKey={API_KEY}"
+    else:
+        url = f"https://newsapi.org/v2/everything?q={request.bank_name}&language={request.language}&apiKey={API_KEY}"
     response = requests.get(url)
     return response.json().get("articles", [])
 
@@ -43,16 +46,14 @@ def fetch_news(request: BankRequest):
 def fetch_rss_articles(query: str):
     feed_url = f"https://news.google.com/rss/search?q={query}"
     feed = feedparser.parse(feed_url)
-    print(feed)
-    articles = []
-    for entry in feed.entries:
-        articles.append({
+    # Only extract what's needed
+    return [
+        {
             "title": entry.title,
             "link": entry.link,
-            "published": entry.published,
-            "summary": entry.summary,
-        })
-    return articles
+        }
+        for entry in feed.entries
+    ]
 
 
 

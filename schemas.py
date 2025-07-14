@@ -32,7 +32,8 @@ class State(BaseModel):
     bank_name: str
     articles: Optional[List[Article]] = None
     results: Optional[List[SentimentResult]] = None
-    error: Optional[str] = None  # ← Add this
+    error: Optional[str] = None
+    language: str
 
 
 

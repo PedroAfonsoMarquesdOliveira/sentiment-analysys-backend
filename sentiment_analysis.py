@@ -8,7 +8,9 @@ def analyze_articles(articles):
     results = []
     for article in articles:
         title = article.get("title") or ""
-        desc = article.get("description") or ""
+        desc = article.get("content") or ""
+        if not title or not desc:
+            continue  # Skip article if either field is missing or empty
         content = (title + " " + desc)[:512]
         sentiment = sentiment_model(content)[0]
 

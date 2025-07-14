@@ -14,7 +14,6 @@ def validate_bank_node(state):
     bank = state.bank_name
     prompt = f"Is '{bank}' the name of a real bank? Answer yes or no."
     answer = llm.invoke(prompt).content.lower()
-    print(answer)
     if "yes" not in answer:
         print("AQUI")
         return {"error": f"'{bank}' is not recognized as a real bank."}

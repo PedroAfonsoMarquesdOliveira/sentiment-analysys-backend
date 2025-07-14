@@ -2,13 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from graph import build_graph, State
-from news_fetcher import fetch_news, fetch_rss_articles
+from graph import build_graph, State, build_graph_serper_api
+from news_fetcher import fetch_news
 from schemas import BankRequest
 from sentiment_analysis import analyze_articles, analyze_bank_news_v2
 
 app = FastAPI()
 graph = build_graph()
+graph_serper_api=build_graph_serper_api()
 # CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
@@ -30,7 +31,15 @@ def analyze_sentiment(request: BankRequest):
 @app.post("/analyze_llm/")
 def analyze(request: State):
     print(request)
-    result = graph.invoke({"bank_name": request.bank_name})
+    result = graph.invoke({"bank_name": request.bank_name, "language": request.language})
+    if "error" in result and result["error"]:
+        return {"error": result["error"]}
+    return result.get("results")
+
+
+@app.post("/analyze_llm_serper/")
+def analyze(request: State):
+    result = graph.invoke({"bank_name": request.bank_name, "language": request.language})
     if "error" in result and result["error"]:
         return {"error": result["error"]}
     return result.get("results")
