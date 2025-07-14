@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Any, Dict
+from typing import Optional, List
 
 class BankRequest(BaseModel):
     bank_name: str
