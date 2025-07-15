@@ -1,13 +1,19 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
 from graph import build_graph, State, build_graph_serper_api
 from news_fetcher import fetch_news
+from nodes.sentiment_analysis import analyze_articles, analyze_bank_news_v2
 from schemas import BankRequest
-from sentiment_analysis import analyze_articles, analyze_bank_news_v2
 
 app = FastAPI()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", port=8080)
+
 graph = build_graph()
 graph_serper_api=build_graph_serper_api()
 # CORS for React frontend
