@@ -46,7 +46,7 @@ def fetch_bank_news(request: BankRequest):
         "q": request.bank_name,
         "token": API_KEY,
         "lang": "en",
-        "max": 10
+        "max": request.lim
     }
 
     try:
