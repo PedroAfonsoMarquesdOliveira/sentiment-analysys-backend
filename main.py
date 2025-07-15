@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from graph import build_graph, State, build_graph_serper_api
-from news_fetcher import fetch_news
+from news_fetcher import fetch_news, fetch_bank_news
 from nodes.sentiment_analysis import analyze_articles, analyze_bank_news_v2
 from schemas import BankRequest
 
@@ -35,8 +35,7 @@ def read_root():
 
 @app.post("/analyze/")
 def analyze_sentiment(request: BankRequest):
-
-    articles = fetch_news(request)
+    articles = fetch_bank_news(request)
     results = analyze_articles(articles)
     return results
 
