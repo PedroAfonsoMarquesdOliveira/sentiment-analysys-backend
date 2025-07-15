@@ -17,10 +17,10 @@ def search_articles_node(state):
 
     try:
         response = requests.get(url, params=params)
-        response.raise_for_status()
-        return response.json().get("articles", [])
+        articles = response.json().get("articles", [])
+        return {**state.dict(), "articles": articles}
     except requests.HTTPError as e:
-        return [{"error": f"HTTP Error: {e.response.status_code}, {e.response.text}"}]
+        return {**state.dict(), "articles": None, "error": f"HTTP Error: {e.response.status_code}, {e.response.text}"}
     except Exception as e:
-        return [{"error": f"Error fetching news: {str(e)}"}]
+        return {**state.dict(), "articles": None, "error": f"Error fetching news: {str(e)}"}
 
