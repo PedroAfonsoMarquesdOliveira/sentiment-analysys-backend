@@ -4,6 +4,7 @@ from typing import Optional, List
 class BankRequest(BaseModel):
     bank_name: str
     language: str
+    limit: int
 
 class SentimentResult(BaseModel):
     title: Optional[str]
@@ -34,6 +35,7 @@ class State(BaseModel):
     results: Optional[List[SentimentResult]] = None
     error: Optional[str] = None
     language: str
+    limit: int
 
 
 
