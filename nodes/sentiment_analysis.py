@@ -1,8 +1,11 @@
 from news_fetcher import fetch_rss_articles, extract_article_text
-from transformers import pipeline
-sentiment_model = pipeline("sentiment-analysis")
+import os
+from huggingface_hub import InferenceClient
 
-
+client = InferenceClient(
+    provider="auto",
+    api_key=os.environ["HF_TOKEN"],
+)
 
 def sentiment_node(state):
     articles = state.articles
@@ -12,13 +15,16 @@ def sentiment_node(state):
             continue  # Skip this article
         text = (article.title or "") + " " + (article.content or "")
         text = text.strip()[:512]
-        sentiment = sentiment_model(text)[0]
-
+        result = client.text_classification(
+            text,
+            model="tabularisai/multilingual-sentiment-analysis",
+        )
+        highest = max(result, key=lambda x: x['score'])
         results.append({
             "title": article.title,
             "url": article.url,
-            "sentiment": sentiment["label"],
-            "score": sentiment["score"]
+            "sentiment": highest["label"],
+            "score": highest["score"]
         })
 
     return {**state.dict(), "results": results}
@@ -32,13 +38,17 @@ def analyze_articles(articles):
         if not title or not desc:
             continue  # Skip article if either field is missing or empty
         content = (title + " " + desc)[:512]
-        sentiment = sentiment_model(content)[0]
+        result = client.text_classification(
+            content,
+            model="tabularisai/multilingual-sentiment-analysis",
+        )
+        highest = max(result, key=lambda x: x['score'])
 
         results.append({
             "title": title,
             "url": article.get("url"),
-            "sentiment": sentiment["label"],
-            "score": sentiment['score']
+            "sentiment": highest["label"],
+            "score": highest["score"]
         })
     return results
 
@@ -50,13 +60,17 @@ def analyze_bank_news_v2(bank_name: str):
     for article in articles:
         full_text = extract_article_text(article["link"])
         content = (article["title"] + " " + full_text)[:512]
-        sentiment = sentiment_model(content)[0]
+        result = client.text_classification(
+            content,
+            model="tabularisai/multilingual-sentiment-analysis",
+        )
+        highest = max(result, key=lambda x: x['score'])
 
         results.append({
             "title": article["title"],
             "url": article["link"],
-            "sentiment": sentiment["label"],
-            "score": sentiment["score"]
+            "sentiment": highest["label"],
+            "score": highest["score"]
         })
 
     return results
