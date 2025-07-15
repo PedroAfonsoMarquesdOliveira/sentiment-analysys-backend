@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
 graph = build_graph()
 graph_serper_api=build_graph_serper_api()
+
 # CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
