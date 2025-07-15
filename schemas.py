@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 
 class BankRequest(BaseModel):
@@ -14,19 +14,21 @@ class SentimentResult(BaseModel):
 
 
 class Source(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = None
     name: str
-
 
 class Article(BaseModel):
     source: Source
-    author: Optional[str]
+    author: Optional[str] = None
     title: Optional[str]
     description: Optional[str]
     url: Optional[str]
-    urlToImage: Optional[str]
+    urlToImage: Optional[str] = Field(None, alias='image')
     publishedAt: Optional[str]
     content: Optional[str]
+    class Config:
+        allow_population_by_field_name = True
+        extra = "ignore"
 
 
 class State(BaseModel):

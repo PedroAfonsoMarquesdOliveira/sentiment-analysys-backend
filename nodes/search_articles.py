@@ -7,7 +7,6 @@ from news_fetcher import get_articles
 def search_articles_node(state):
     try:
         articles = get_articles(state.bank_name, state.language, state.limit)
-        print(articles)
         print(len(articles))
         return {**state.dict(), "articles": articles, "error": None}
     except requests.HTTPError as e:
