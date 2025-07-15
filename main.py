@@ -21,12 +21,18 @@ graph = build_graph()
 graph_serper_api=build_graph_serper_api()
 
 # CORS for React frontend
+from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=[
+        "http://localhost:3000",  # Local dev
+        "https://sentiment-analysys-frontend.vercel.app",  # Vercel production frontend
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/")
 def read_root():

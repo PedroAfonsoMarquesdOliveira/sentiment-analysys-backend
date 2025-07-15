@@ -38,26 +38,35 @@ def fetch_news(request: BankRequest):
     return []
 
 
-def fetch_bank_news(request: BankRequest):
+def get_articles(bank_name, language, limit):
     API_KEY = os.getenv("GNEWS_API_KEY")
     if not API_KEY:
         raise ValueError("GNEWS_API_KEY not found in environment variables.")
+
     url = "https://gnews.io/api/v4/search"
     params = {
-        "q": request.bank_name,
+        "q": bank_name,
         "token": API_KEY,
-        "lang": "en",
-        "max": request.limit
+        "max": limit
     }
+    if language != "all":
+        params["lang"] = language
 
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    return response.json().get("articles", [])
+
+
+
+def fetch_bank_news(request: BankRequest):
     try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        return response.json().get("articles", [])
+        articles = get_articles(request.bank_name, request.language, request.limit)
+        return articles
     except requests.HTTPError as e:
         return [{"error": f"HTTP Error: {e.response.status_code}, {e.response.text}"}]
     except Exception as e:
         return [{"error": f"Error fetching news: {str(e)}"}]
+
 
 
 # def fetch_serper_news(query: str):
