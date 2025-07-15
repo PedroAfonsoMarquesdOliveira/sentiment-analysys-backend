@@ -44,7 +44,7 @@ def analyze_sentiment(request: BankRequest):
 @app.post("/analyze_llm/")
 def analyze(request: State):
     print(request)
-    result = graph.invoke({"bank_name": request.bank_name, "language": request.language})
+    result = graph.invoke({"bank_name": request.bank_name, "language": request.language,"limit":request.limit})
     if "error" in result and result["error"]:
         return {"error": result["error"]}
     return result.get("results")
@@ -52,7 +52,7 @@ def analyze(request: State):
 
 @app.post("/analyze_llm_serper/")
 def analyze(request: State):
-    result = graph.invoke({"bank_name": request.bank_name, "language": request.language})
+    result = graph.invoke({"bank_name": request.bank_name, "language": request.language,"limit":request.limit})
     if "error" in result and result["error"]:
         return {"error": result["error"]}
     return result.get("results")
@@ -60,5 +60,5 @@ def analyze(request: State):
 
 @app.post("/analyze_v2/")
 def analyze_sentiment_v2(request: BankRequest):
-    results = analyze_bank_news_v2(request.bank_name)
+    results = analyze_bank_news_v2(request)
     return results

@@ -17,7 +17,8 @@ def fetch_news(request: BankRequest):
     base_url = "https://newsapi.org/v2/everything"
     params = {
         "q": request.bank_name,
-        "apiKey": API_KEY
+        "apiKey": API_KEY,
+        "pageSize": request.limit
     }
     if request.language != "all":
         params["language"] = request.language
@@ -46,7 +47,7 @@ def fetch_bank_news(request: BankRequest):
         "q": request.bank_name,
         "token": API_KEY,
         "lang": "en",
-        "max": request.lim
+        "max": request.limit
     }
 
     try:
@@ -83,8 +84,8 @@ def fetch_bank_news(request: BankRequest):
 
 
 #mais lento
-def fetch_rss_articles(query: str):
-    feed_url = f"https://news.google.com/rss/search?q={query}"
+def fetch_rss_articles(request: BankRequest):
+    feed_url = f"https://news.google.com/rss/search?q={request.bank_name}"
     feed = feedparser.parse(feed_url)
     # Only extract what's needed
     return [
@@ -92,7 +93,7 @@ def fetch_rss_articles(query: str):
             "title": entry.title,
             "link": entry.link,
         }
-        for entry in feed.entries
+        for entry in feed.entries[:request.limit]
     ]
 
 

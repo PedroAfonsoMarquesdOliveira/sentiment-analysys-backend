@@ -2,6 +2,8 @@ from news_fetcher import fetch_rss_articles, extract_article_text
 import os
 from huggingface_hub import InferenceClient
 
+from schemas import BankRequest
+
 client = InferenceClient(
     provider="auto",
     api_key=os.environ["HF_TOKEN"],
@@ -53,8 +55,9 @@ def analyze_articles(articles):
     return results
 
 
-def analyze_bank_news_v2(bank_name: str):
-    articles = fetch_rss_articles(bank_name)
+#muito lento
+def analyze_bank_news_v2(request: BankRequest):
+    articles = fetch_rss_articles(request)
     results = []
 
     for article in articles:
