@@ -14,13 +14,28 @@ def search_articles_node(state):
         "lang": "en",
         "max": state.limit
     }
-
+    print(f"Calling GNews: {url} with params: {params}")
     try:
+        print(f"Calling GNews: {url} with params: {params}")
         response = requests.get(url, params=params)
+
+        # Raise HTTPError for non-200 responses
+        response.raise_for_status()
+
+        # Check if content is empty to avoid JSONDecodeError
+        if not response.content.strip():
+            return {**state.dict(), "articles": None, "error": "GNews returned empty response."}
+
         articles = response.json().get("articles", [])
-        return {**state.dict(), "articles": articles}
-    except requests.HTTPError as e:
-        return {**state.dict(), "articles": None, "error": f"HTTP Error: {e.response.status_code}, {e.response.text}"}
+        return {**state.dict(), "articles": articles, "error": None}
+
+    except requests.exceptions.HTTPError as e:
+        return {**state.dict(), "articles": None, "error": f"HTTP Error {e.response.status_code}: {e.response.text}"}
+
+    except requests.exceptions.JSONDecodeError as e:
+        return {**state.dict(), "articles": None, "error": f"Invalid JSON from GNews: {str(e)}"}
+
     except Exception as e:
-        return {**state.dict(), "articles": None, "error": f"Error fetching news: {str(e)}"}
+        return {**state.dict(), "articles": None, "error": f"Unexpected error: {str(e)}"}
+
 
