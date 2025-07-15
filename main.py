@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+import os
 
 from graph import build_graph, State, build_graph_serper_api
 from news_fetcher import fetch_news
@@ -11,8 +11,12 @@ from schemas import BankRequest
 app = FastAPI()
 
 
+
+port = int(os.environ.get("PORT", 8000))  # default fallback to 8000
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=8080)
+    import uvicorn
+    uvicorn.run("main:app", port=port, reload=True)
 
 graph = build_graph()
 graph_serper_api=build_graph_serper_api()
