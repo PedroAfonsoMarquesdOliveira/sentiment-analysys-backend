@@ -7,16 +7,34 @@ from newspaper import Article
 from schemas import BankRequest
 
 load_dotenv()
+
+
 def fetch_news(request: BankRequest):
     API_KEY = os.getenv("NEWS_API_KEY")
     if not API_KEY:
         raise ValueError("NEWS_API_KEY not found in environment variables.")
-    if request.language == "all":
-        url = f"https://newsapi.org/v2/everything?q={request.bank_name}&apiKey={API_KEY}"
-    else:
-        url = f"https://newsapi.org/v2/everything?q={request.bank_name}&language={request.language}&apiKey={API_KEY}"
-    response = requests.get(url)
-    return response.json().get("articles", [])
+
+    base_url = "https://newsapi.org/v2/everything"
+    params = {
+        "q": request.bank_name,
+        "apiKey": API_KEY
+    }
+    if request.language != "all":
+        params["language"] = request.language
+
+    response = requests.get(base_url, params=params)
+
+    # Check for HTTP errors
+    try:
+        response.raise_for_status()  # Raises an error for 4xx/5xx codes
+        return response.json().get("articles", [])
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTPError: {e}, Status Code: {response.status_code}, Body: {response.text}")
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"JSONDecodeError: {e}, Body: {response.text}")
+
+    # Fallback: return empty list if error happens
+    return []
 
 
 # def fetch_serper_news(query: str):
