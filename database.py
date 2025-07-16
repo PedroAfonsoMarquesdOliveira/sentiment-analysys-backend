@@ -22,8 +22,7 @@ class SentimentResult_save(BaseModel):
 
 # SQLAlchemy setup
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"  # local file named test.db
-os.environ["SQLALCHEMY_DATABASE_URL"] = os.getenv("SQLALCHEMY_DATABASE_URL")
-SQLALCHEMY_DATABASE_URL = os.environ["SQLALCHEMY_DATABASE_URL"]
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 # engine = create_engine(
 #     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -46,19 +45,27 @@ class SentimentResultDB(Base):
     url = Column(String, nullable=True)
     sentiment = Column(String)
     score = Column(Float)
-    name = Column(String)  # ✅ THIS LINE is mandatory
+    name = Column(String)
+    language = Column(String)
 
 
 # Create the tables
 Base.metadata.create_all(bind=engine)
 
 
-def read_sentiments(bank_name, db: Session):
+def read_sentiments(bank_name, language, db: Session):
     query = db.query(SentimentResultDB)
     if bank_name is None:
         query = query.filter(SentimentResultDB.name.is_(None))
     else:
         query = db.query(SentimentResultDB).filter(SentimentResultDB.name == bank_name)
+
+    if language is None:
+        query = query.filter(SentimentResultDB.language.is_(None))
+    else:
+        query = query.filter(SentimentResultDB.language == language)
+
+    return query.all()
 
     results = query.all()
     return [
@@ -73,7 +80,7 @@ def read_sentiments(bank_name, db: Session):
     ]
 
 
-def save_results(bank_name: str, db: Session, results: list):
+def save_results(bank_name: str, language: str, db: Session, results: list):
     for res in results:
         exists = db.query(SentimentResultDB).filter(
             SentimentResultDB.url == res.get("url")
@@ -86,13 +93,14 @@ def save_results(bank_name: str, db: Session, results: list):
                 sentiment=res.get("sentiment"),
                 score=res.get("score"),
                 name=bank_name,
+                language=language
             )
             db.add(db_result)
 
     db.commit()
 
 
-def save_results_llm(bank_name: str, db: Session, results: list):
+def save_results_llm(bank_name: str, language: str, db: Session, results: list):
     for res in results:
         exists = db.query(SentimentResultDB).filter(
             SentimentResultDB.url == res.url
@@ -105,6 +113,7 @@ def save_results_llm(bank_name: str, db: Session, results: list):
                 sentiment=res.sentiment,
                 score=res.score,
                 name=bank_name,
+                language=language
             )
             db.add(db_result)
 

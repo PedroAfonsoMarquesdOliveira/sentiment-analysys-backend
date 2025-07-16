@@ -53,12 +53,13 @@ def read_root():
 
 def get_or_fetch_and_save(
         bank_name: str,
+        language: str,
         db: Session,
         fetch_fn,
         limit: int = None,
         use_llm_save: bool = False,
 ):
-    existing = read_sentiments(bank_name, db)
+    existing = read_sentiments(bank_name, language, db)
     if existing and (limit is None or len(existing) >= limit):
         print("enough existing in database")
         return existing[:limit] if limit else existing
@@ -68,18 +69,18 @@ def get_or_fetch_and_save(
 
     # Choose save function based on flag
     if use_llm_save:
-        save_results_llm(bank_name, db, results)
+        save_results_llm(bank_name, language, db, results)
     else:
-        save_results(bank_name, db, results)
+        save_results(bank_name, language, db, results)
 
     return results
-
 
 
 @app.post("/analyze/")
 def analyze_sentiment(request: BankRequest, db: Session = Depends(get_db)):
     return get_or_fetch_and_save(
         bank_name=request.bank_name,
+        language=request.language,
         db=db,
         limit=request.limit,
         fetch_fn=lambda: analyze_articles(fetch_bank_news(request))
@@ -97,6 +98,7 @@ def analyze(request: State, db: Session = Depends(get_db)):
     try:
         return get_or_fetch_and_save(
             bank_name=request.bank_name,
+            language=request.language,
             db=db,
             fetch_fn=fetch,
             limit=request.limit,
@@ -118,6 +120,7 @@ def analyze(request: State, db: Session = Depends(get_db)):
     try:
         return get_or_fetch_and_save(
             bank_name=request.bank_name,
+            language=request.language,
             db=db,
             fetch_fn=fetch,
             limit=request.limit,
@@ -131,6 +134,7 @@ def analyze(request: State, db: Session = Depends(get_db)):
 def analyze_sentiment_v2(request: BankRequest, db: Session = Depends(get_db)):
     return get_or_fetch_and_save(
         bank_name=request.bank_name,
+        language=request.language,
         db=db,
         fetch_fn=lambda: analyze_bank_news_v2(request),
         limit=request.limit
