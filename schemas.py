@@ -26,9 +26,9 @@ class Article(BaseModel):
     urlToImage: Optional[str] = Field(None, alias='image')
     publishedAt: Optional[str]
     content: Optional[str]
-    class Config:
-        allow_population_by_field_name = True
-        extra = "ignore"
+    model_config = {
+        "validate_by_name": True
+    }
 
 
 class State(BaseModel):

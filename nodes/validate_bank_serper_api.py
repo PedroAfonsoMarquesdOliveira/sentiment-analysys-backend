@@ -1,6 +1,7 @@
 import requests
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
+
 load_dotenv()
 import os
 
@@ -10,6 +11,7 @@ llm = ChatOpenAI(
     temperature=0,
     openai_api_base="https://api.mistral.ai/v1",
     openai_api_key=os.environ["OPENAI_API_KEY"])
+
 
 def is_real_bank_serper_and_llm(state):
     url = "https://google.serper.dev/search"
@@ -44,6 +46,6 @@ def is_real_bank_serper_and_llm(state):
     )
     response = llm.invoke(prompt).content.strip().lower()
     if "yes" not in response:
+        print(state.bank_name + " is not a bank")
         return {"error": f"'{state.bank_name}' is not recognized as a real bank."}
     return state
-

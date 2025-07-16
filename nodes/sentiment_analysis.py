@@ -9,6 +9,7 @@ client = InferenceClient(
     api_key=os.environ["HF_TOKEN"],
 )
 
+
 def sentiment_node(state):
     articles = state.articles
     results = []
@@ -55,7 +56,7 @@ def analyze_articles(articles):
     return results
 
 
-#muito lento
+# muito lento
 def analyze_bank_news_v2(request: BankRequest):
     articles = fetch_rss_articles(request)
     results = []

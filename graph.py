@@ -1,7 +1,4 @@
-
-
 from langgraph.graph import StateGraph, END
-
 
 from nodes.validate_bank import validate_bank_node, has_error
 from nodes.search_articles import search_articles_node

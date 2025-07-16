@@ -12,3 +12,5 @@ torch
 lxml[html_clean]
 dotenv~=0.9.9
 huggingface-hub~=0.33.4
+SQLAlchemy~=2.0.41
+psycopg2-binary
